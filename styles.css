@@ -1,0 +1,1105 @@
+﻿:root {
+  --gold: #ffd98a;
+  --gold-soft: #ffe9b0;
+  --glass-bg: rgba(16, 12, 34, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --text: #f4edff;
+  --text-muted: rgba(244, 237, 255, 0.66);
+  --bar-w: min(440px, calc(100% - 2rem));
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: "Poppins", "Noto Sans Bengali", sans-serif;
+  color: var(--text);
+  background: #0a0d22;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ---------- Background ---------- */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0a0d22 0%, #151a3d 50%, #241436 100%);
+}
+
+.scene-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.star {
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Background video â€” fills the whole page as the animated backdrop.
+   Hidden until it's confirmed to load (body.has-bg). */
+.bg-video {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* Dark overlay on top of the video so player text stays readable */
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(6, 5, 16, 0.5);
+}
+
+/* Colorful blurred fill that covers the whole screen so there are
+   never empty/dark areas around the artwork */
+.bg-blur {
+  display: none;
+  position: absolute;
+  inset: -15%;
+  z-index: 2;
+  background-color: #1a0f30;
+  background-image: radial-gradient(
+      110% 80% at 50% 22%,
+      rgba(255, 217, 138, 0.28),
+      transparent 60%
+    ),
+    radial-gradient(
+      100% 90% at 50% 95%,
+      rgba(255, 110, 180, 0.24),
+      transparent 62%
+    ),
+    radial-gradient(
+      120% 110% at 18% 80%,
+      rgba(120, 84, 190, 0.3),
+      transparent 60%
+    ),
+    linear-gradient(160deg, rgba(90, 60, 160, 0.35), transparent 55%),
+    url("background.jpg"),
+    url("background.png");
+  background-size: auto, auto, auto, auto, cover;
+  background-position: center;
+  filter: blur(52px) saturate(1.65) brightness(1.1);
+  opacity: 0.85;
+  box-shadow: inset 0 0 240px rgba(4, 3, 12, 0.55);
+  transition: opacity 0.6s ease;
+  animation: breathe 26s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+/* The artwork at its original size â€” the full image is always visible,
+   never cropped, never stretched */
+.bg-image {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background-image: url("background.jpg"), url("background.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  filter: drop-shadow(0 34px 90px rgba(4, 3, 12, 0.45));
+  transition: opacity 0.6s ease;
+}
+
+body.has-bg .bg-video {
+  display: block;
+  opacity: 1;
+}
+
+body.has-bg .bg-image {
+  opacity: 1;
+}
+
+body.has-bg .scene-svg {
+  opacity: 0;
+}
+
+/* Soft gradient at top and bottom so text stays readable */
+.scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 3, 11, 0.35) 0%,
+    rgba(5, 3, 11, 0) 30%,
+    rgba(5, 3, 11, 0) 65%,
+    rgba(5, 3, 11, 0.55) 100%
+  );
+}
+
+/* ---------- Content ---------- */
+.content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1.25rem 1.25rem 7rem;
+}
+
+.footer {
+  text-align: center;
+}
+
+.footer p {
+  font-family: "Noto Sans Bengali", sans-serif;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* ---------- Glass ---------- */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* ---------- Time & weather ---------- */
+.top-widget {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 1rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.weather {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: "Noto Sans Bengali", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #3a3a4a;
+  background: radial-gradient(
+      120% 140% at 18% 12%,
+      #ffffff 0%,
+      #eef3ff 50%,
+      #d7e1f7 100%
+    ),
+    #eef3ff;
+  padding: 0.55rem 0.85rem 0.55rem 0.7rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  line-height: 1;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(120, 140, 220, 0.28),
+    inset 0 2px 6px rgba(255, 255, 255, 0.9),
+    inset 0 -6px 14px rgba(160, 175, 235, 0.4);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: background 0.6s ease, color 0.6s ease, box-shadow 0.6s ease;
+}
+
+/* The crisp, clearly-visible weather emoji icon */
+.weather-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 1.25rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.weather-emoji {
+  position: relative;
+  z-index: 1;
+  font-size: 0.95rem;
+}
+
+/* Animated accent layers — hidden unless their condition is active */
+.weather .wx-rain,
+.weather .wx-snow,
+.weather .wx-bolt {
+  position: absolute;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Each condition animates a different background tone */
+.weather[data-weather="sunny"] {
+  color: #8a6d12;
+  background: radial-gradient(
+      120% 140% at 18% 12%,
+      #fffbe0 0%,
+      #fff3ae 55%,
+      #ffd766 100%
+    ),
+    #fff3ae;
+}
+.weather[data-weather="partly"] {
+  color: #5b6386;
+  background: radial-gradient(
+      120% 140% at 18% 12%,
+      #ffffff 0%,
+      #e6edfb 55%,
+      #bfcdf0 100%
+    ),
+    #e6edfb;
+}
+.weather[data-weather="cloudy"] {
+  color: #5f6a84;
+  background: linear-gradient(180deg, #d7deea 0%, #b8c3d8 100%);
+  box-shadow: 0 10px 26px rgba(110, 125, 160, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7),
+    inset 0 -6px 12px rgba(110, 125, 160, 0.35);
+}
+.weather[data-weather="rain"] {
+  color: #4a5a80;
+  background: linear-gradient(180deg, #c3d0e8 0%, #94a7c9 100%);
+  box-shadow: 0 10px 26px rgba(80, 110, 160, 0.4),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7),
+    inset 0 -6px 12px rgba(80, 110, 160, 0.4);
+}
+.weather[data-weather="snow"] {
+  color: #5a6688;
+  background: linear-gradient(180deg, #eef4ff 0%, #c9d6ef 100%);
+  box-shadow: 0 10px 26px rgba(120, 145, 200, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.9),
+    inset 0 -6px 12px rgba(150, 175, 220, 0.4);
+}
+.weather[data-weather="storm"] {
+  color: #c8d2ec;
+  background: linear-gradient(180deg, #3d4568 0%, #232a45 100%);
+  box-shadow: 0 10px 26px rgba(30, 40, 80, 0.5),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25),
+    inset 0 -6px 12px rgba(10, 15, 40, 0.6);
+}
+
+/* ---- Rain drops (falling over the emoji) ---- */
+.weather[data-weather="rain"] .wx-rain {
+  opacity: 1;
+  left: 0.55rem;
+  top: 12%;
+  width: 18px;
+  height: 20px;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 3px,
+    rgba(60, 110, 210, 0.95) 3px 5px
+  );
+  background-position: 0 8px;
+  animation: rainFall 0.7s linear infinite;
+}
+@keyframes rainFall {
+  to {
+    background-position: 0 -8px;
+  }
+}
+
+/* ---- Snow ---- */
+.weather[data-weather="snow"] .wx-snow {
+  opacity: 1;
+  left: 0.55rem;
+  top: 10%;
+  width: 22px;
+  height: 22px;
+  background-image: radial-gradient(circle 2.5px at 5px 5px, #ffffff 100%, transparent),
+    radial-gradient(circle 2.5px at 15px 9px, #ffffff 100%, transparent),
+    radial-gradient(circle 2.5px at 9px 16px, #ffffff 100%, transparent);
+  background-repeat: no-repeat;
+  animation: snowFall 1.6s linear infinite;
+}
+@keyframes snowFall {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+}
+
+/* ---- Storm: lightning sparks + flash ---- */
+.weather[data-weather="storm"] .wx-bolt {
+  opacity: 1;
+  left: 0.6rem;
+  top: 18%;
+  width: 16px;
+  height: 22px;
+  background: #ffd83d;
+  clip-path: polygon(55% 0, 8% 55%, 46% 55%, 28% 100%, 92% 42%, 55% 42%);
+  animation: boltFlash 1.8s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 216, 61, 0.95));
+}
+@keyframes boltFlash {
+  0%,
+  66% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  68%,
+  74% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+.weather[data-weather="storm"] {
+  animation: stormBg 1.8s infinite;
+}
+@keyframes stormBg {
+  0%,
+  66%,
+  100% {
+    opacity: 1;
+  }
+  68%,
+  74% {
+    opacity: 0.7;
+  }
+}
+
+.clock {
+  position: relative;
+  padding: 0.6rem 1.1rem 0.65rem;
+  border-radius: 60px;
+  text-align: left;
+  color: #3a3a4a;
+  background: radial-gradient(
+      120% 140% at 20% 10%,
+      #ffffff 0%,
+      #f4f1ff 45%,
+      #dfe7fb 75%,
+      #cdd6ef 100%
+    ),
+    #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 34px rgba(120, 140, 220, 0.3),
+    0 0 40px rgba(200, 215, 255, 0.25),
+    inset 0 2px 6px rgba(255, 255, 255, 0.95),
+    inset 0 -6px 14px rgba(160, 175, 235, 0.45);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  animation: cloudFloat 6s ease-in-out infinite;
+}
+
+/* Soft moving sheen across the pearly cloud */
+.clock::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 60px;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.85) 45%,
+    rgba(210, 222, 255, 0.4) 55%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  background-size: 250% 100%;
+  background-position: 0% 0;
+  animation: cloudSheen 5.5s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes cloudFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+@keyframes cloudSheen {
+  0%,
+  100% {
+    background-position: 0% 0;
+  }
+  50% {
+    background-position: 100% 0;
+  }
+}
+
+/* Fluffy cloud puffs on the left edge */
+.clock::before {
+  content: "";
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  left: -16px;
+  top: 4px;
+  border-radius: 50%;
+  background: radial-gradient(
+    60% 60% at 50% 40%,
+    #ffffff 0%,
+    #eef2ff 60%,
+    #dbe4f7 100%
+  );
+  z-index: -1;
+  box-shadow: 0 8px 20px rgba(120, 140, 220, 0.2);
+}
+
+.clock-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.clock-time {
+  position: relative;
+  z-index: 1;
+  font-family: "DM Serif Display", serif;
+  font-size: 1.85rem;
+  line-height: 1;
+  color: #474b6b;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+  filter: none;
+}
+
+.clock-ampm {
+  position: relative;
+  z-index: 1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6a7090;
+}
+
+.clock-date {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.2rem;
+  font-family: "Noto Sans Bengali", sans-serif;
+  font-size: 0.74rem;
+  color: #6a7090;
+}
+
+/* ---------- Compact player ---------- */
+.player-wrap {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 10;
+  width: var(--bar-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.player-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Pill chips */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+  border-radius: 999px;
+  padding: 0.38rem 0.75rem;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.92);
+  font-family: "Poppins", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.pill:active {
+  transform: scale(0.95);
+}
+
+.pill .ico {
+  flex: 0 0 auto;
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: currentColor;
+}
+
+.pill .chev {
+  flex: 0 0 auto;
+  width: 0.8rem;
+  height: 0.8rem;
+  fill: currentColor;
+  opacity: 0.7;
+}
+
+.pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 0.55rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pill-vol {
+  min-width: 1.3rem;
+  text-align: center;
+  font-size: 0.58rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+/* Player card */
+.player-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+}
+
+.pc-cover {
+  flex: 0 0 auto;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pc-mid {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pc-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.pc-artist {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pc-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.pc-time {
+  flex: 0 0 auto;
+  min-width: 1.9rem;
+  text-align: center;
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pb-range {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--gold) 0%,
+    var(--gold) var(--range-pct, 0%),
+    rgba(255, 255, 255, 0.2) var(--range-pct, 0%),
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  cursor: pointer;
+}
+
+.pb-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 8px rgba(255, 217, 138, 0.7);
+  cursor: pointer;
+}
+
+.pb-range::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: var(--gold-soft);
+  box-shadow: 0 0 8px rgba(255, 217, 138, 0.7);
+  cursor: pointer;
+}
+
+.pc-controls {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pc-btn {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.pc-btn svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: currentColor;
+}
+
+.pc-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.pc-btn:active {
+  transform: scale(0.92);
+}
+
+.pc-btn.pc-play {
+  width: 2.4rem;
+  height: 2.4rem;
+  background: #fff;
+  color: #000;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+.pc-btn.pc-play:hover {
+  background: #fff;
+  transform: scale(1.05);
+}
+
+.pc-btn.pc-play svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.pc-note {
+  max-width: 100%;
+  text-align: center;
+  font-family: "Noto Sans Bengali", sans-serif;
+  font-size: 0.66rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.55);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Volume popover ---------- */
+.vol-wrap {
+  position: relative;
+}
+
+.volume-popover {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  right: -0.5rem;
+  padding: 0.85rem 0.6rem;
+  border-radius: 14px;
+  z-index: 21;
+  background: rgba(18, 14, 38, 0.85);
+}
+
+.volume-popover .pb-range {
+  width: 120px;
+}
+
+/* ---------- Song list panel ---------- */
+.list-panel {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 7.4rem);
+  z-index: 15;
+  width: min(430px, calc(100% - 1rem));
+  max-height: min(46vh, 420px);
+  border-radius: 20px;
+  padding: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  background: rgba(18, 14, 38, 0.72);
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.2rem 0.4rem 0.55rem;
+  flex: 0 0 auto;
+}
+
+.list-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.list-close {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.list-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.list-close svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: currentColor;
+}
+
+.list-items {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.list-empty {
+  padding: 1rem 0.5rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.list-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.list-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.list-item.active {
+  background: rgba(255, 217, 138, 0.16);
+}
+
+.list-item-index {
+  flex: 0 0 auto;
+  width: 1.2rem;
+  text-align: center;
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.list-item.active .list-item-index {
+  color: var(--gold);
+}
+
+.list-item-thumb {
+  flex: 0 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 9px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.list-item-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item-title {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item-artist {
+  font-size: 0.66rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item-playing {
+  flex: 0 0 auto;
+  color: var(--gold);
+  font-size: 0.8rem;
+}
+
+/* ---------- YouTube host ---------- */
+.yt-holder {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  width: 400px;
+  height: 300px;
+  pointer-events: none;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+}
+
+/* =========================================================
+   Responsive tweaks â€” nothing is ever cropped: the artwork
+   always uses `contain` so the full image is always visible.
+   ========================================================= */
+
+/* Small phones (â‰¤ 420px) â€” compact bar so nothing overflows */
+@media (max-width: 420px) {
+  :root {
+    --bar-w: calc(100% - 1rem);
+  }
+
+  .player-card {
+    gap: 0.6rem;
+    padding: 0.6rem;
+    border-radius: 18px;
+  }
+
+  .pc-cover {
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 10px;
+  }
+
+  .pc-title {
+    font-size: 0.76rem;
+  }
+
+  .pc-artist {
+    font-size: 0.66rem;
+  }
+
+  .pc-btn {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .pc-btn.pc-play {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .pc-btn svg {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .pc-btn.pc-play svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .pc-time {
+    min-width: 1.7rem;
+    font-size: 0.56rem;
+  }
+
+  .pc-note {
+    font-size: 0.6rem;
+  }
+
+  .list-panel {
+    bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 6.6rem);
+    max-height: 42vh;
+  }
+
+  .top-widget {
+    top: max(0.75rem, env(safe-area-inset-top));
+    left: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .weather {
+    font-size: 0.66rem;
+    padding: 0.45rem 0.5rem;
+  }
+
+  .clock {
+    padding: 0.45rem 0.85rem;
+    border-radius: 40px;
+  }
+
+  .clock::before {
+    width: 24px;
+    height: 24px;
+    left: -12px;
+    top: 3px;
+  }
+  .clock::after {
+    border-radius: 40px;
+  }
+
+  .clock-time {
+    font-size: 1.45rem;
+  }
+
+  .clock-ampm {
+    font-size: 0.64rem;
+  }
+
+  .clock-date {
+    font-size: 0.68rem;
+  }
+
+  .content {
+    padding: 1rem 1rem 6.5rem;
+  }
+}
+
+/* Phones / small tablets portrait (421px â€“ 767px) */
+@media (min-width: 421px) and (max-width: 767px) {
+  :root {
+    --bar-w: min(440px, calc(100% - 1.5rem));
+  }
+
+  .list-panel {
+    max-height: 44vh;
+  }
+}
+
+/* Extra-tall narrow phones: keep the full artwork visible on screen */
+@media (max-aspect-ratio: 9/16) {
+  .bg-image {
+    background-size: contain;
+    background-position: center top 8%;
+  }
+}
