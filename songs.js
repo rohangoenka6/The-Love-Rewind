@@ -1,5 +1,5 @@
 ﻿// ============================================================
-//  The Love Rewind Â· songs
+//  The Love Rewind · songs
 //
 //  This file is the single source of truth for the playlist.
 //  audio: drop a matching file into the /songs folder
@@ -9,6 +9,7 @@
 // ============================================================
 
 var SONGS = [
+  { title: "Sing to Me", artist: "Walter Martin" },
   { title: "Can't Help Falling in Love", artist: "Elvis Presley" },
   { title: "Can't Help Falling In Love", artist: "Elvis Presley" },
   { title: "Yellow", artist: "Coldplay" },
@@ -21,5 +22,4 @@ var SONGS = [
   { title: "Until I Found You", artist: "Stephen Sanchez" },
   { title: "Wonderful Tonight", artist: "Eric Clapton" },
   { title: "Yengejei Nangse", artist: "Zubeen Garg" },
-  { title: "Sing to Me", artist: "Walter Martin" },
 ];
