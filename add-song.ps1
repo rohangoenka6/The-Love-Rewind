@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
-  add-song.ps1 - add a song to "The Love Rewind" (auto-numbers, updates songs.js, pushes).
+  add-song.ps1 - add a song to "The Love Rewind" (unique filename, updates songs.js, pushes).
 
 .DESCRIPTION
-  Copies an MP3 into the /songs folder with the next number, appends the matching
-  entry to songs.js, commits, and (optionally) pushes to GitHub so the new song
-  goes live on GitHub Pages automatically.
-
-  Songs are appended so the file number always matches the playlist position.
+  Copies an MP3 into the /songs folder under a uniquely-named, URL-safe filename
+  derived from the song title, appends the matching entry (with a `file:` field)
+  to songs.js, commits, and (optionally) pushes to GitHub so the new song goes
+  live on GitHub Pages automatically. Unique filenames also avoid stale-cache
+  issues from reusing the same audio URLs.
 
 .EXAMPLE
   .\add-song.ps1 -Title "Thinking Out Loud" -Artist "Ed Sheeran" -From "C:\desktop\track.mp3" -Token "ghp_..."
@@ -33,11 +33,23 @@ if (-not (Test-Path -LiteralPath $songsJs))  { throw "songs.js not found: $songs
 if (-not (Test-Path -LiteralPath $From))     { throw "MP3 not found: $From" }
 if ([System.IO.Path]::GetExtension($From) -notmatch '^\.mp3$') { throw "File must be an MP3 (got: $From)" }
 
-# --- 1. next number (append-only keeps positional mapping valid) ---------------
-$existing = @(Get-ChildItem -LiteralPath $songsDir -Filter *.mp3 -File)
-$next = $existing.Count + 1
-$dest = Join-Path $songsDir ("{0:D2}.mp3" -f $next)
-if (Test-Path -LiteralPath $dest) { throw "Target file already exists: $dest (playlist/file numbering out of sync?)" }
+# --- 1. build a unique, url-safe filename from the title -----------------------
+function Slug([string]$s) {
+  $s = $s.ToLower()
+  $s = [regex]::Replace($s, '[^a-z0-9]+', '-')
+  $s = $s.Trim('-')
+  if ($s -eq "") { $s = "track" }
+  return $s
+}
+$base = Slug $Title
+$existingNames = @(Get-ChildItem -LiteralPath $songsDir -Filter *.mp3 -File | ForEach-Object { $_.BaseName })
+$candidate = $base
+$suffix = 0
+while ($existingNames -contains $candidate) {
+  $suffix++
+  $candidate = "$base-$suffix"
+}
+$dest = Join-Path $songsDir ($candidate + ".mp3")
 
 # --- 2. copy the mp3 -----------------------------------------------------------
 Copy-Item -LiteralPath $From -Destination $dest
@@ -49,20 +61,21 @@ function Esc([string]$s) {
   $s = $s -replace '"', '\"'
   return $s
 }
-$line = '  { title: "' + (Esc $Title) + '", artist: "' + (Esc $Artist) + '" },'
+$fileRef = 'songs/' + $candidate + '.mp3'
+$line = '  { title: "' + (Esc $Title) + '", artist: "' + (Esc $Artist) + '", file: "' + $fileRef + '" },'
 
 $content = Get-Content -LiteralPath $songsJs -Raw
 $pattern = '(?ms)(\];\s*$)'
 if ($content -notmatch $pattern) { throw "Could not find the closing ]; of SONGS in songs.js" }
 $content = $content -replace $pattern, ($line + "`r`n" + '$1')
 Set-Content -LiteralPath $songsJs -Value $content -NoNewline -Encoding UTF8
-Write-Host "  + updated songs.js with #${next}: $Title - $Artist"
+Write-Host "  + updated songs.js: $Title - $Artist  ->  $fileRef"
 
 # --- 4. commit -----------------------------------------------------------------
 Push-Location $root
 try {
   git add -A | Out-Null
-  git commit -m "Add song $($next.ToString('00')): $Title - $Artist" | Out-Null
+  git commit -m "Add song: $Title - $Artist" | Out-Null
   Write-Host "  + committed"
 }
 finally { Pop-Location }
