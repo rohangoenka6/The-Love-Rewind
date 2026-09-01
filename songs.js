@@ -1,5 +1,5 @@
-// ============================================================
-//  The Love Rewind · songs
+﻿// ============================================================
+//  The Love Rewind Â· songs
 //
 //  This file is the single source of truth for the playlist.
 //  audio: drop a matching file into the /songs folder
@@ -21,4 +21,5 @@ var SONGS = [
   { title: "Until I Found You", artist: "Stephen Sanchez" },
   { title: "Wonderful Tonight", artist: "Eric Clapton" },
   { title: "Yengejei Nangse", artist: "Zubeen Garg" },
+  { title: "Sing to Me", artist: "Walter Martin" },
 ];
